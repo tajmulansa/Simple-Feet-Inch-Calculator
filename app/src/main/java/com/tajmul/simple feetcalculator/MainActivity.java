@@ -1,4 +1,4 @@
-package com.tajmul.simplefeetcalculator;
+package com.tajmul.simplefeetinchcalculator;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
