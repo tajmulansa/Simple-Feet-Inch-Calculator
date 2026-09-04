@@ -1,0 +1,1137 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Simple Feet Inch Calculator</title>
+
+<!-- APP ICON & THEME SETTINGS -->
+<meta name="theme-color" content="#0F0F0F">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="application-name" content="Simple Feet Calc">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #0F0F0F;
+  --surface: #1A1A1A;
+  --surface-active: #262626;
+  --surface-subtle: #141414;
+  --primary: #FF9F1C; 
+  --primary-glow: rgba(255, 159, 28, 0.15);
+  --text-main: #FFFFFF;
+  --text-secondary: #8E8E8E;
+  --border: #2C2C2C;
+  --radius: 8px;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  background: var(--bg);
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  color: var(--text-main);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+}
+
+.app-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  height: 100%;
+  position: relative;
+}
+
+/* HEADER */
+.header {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.header h1 {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  margin: 0;
+  text-transform: uppercase;
+  color: var(--text-main);
+}
+
+.header p {
+  font-size: 11px;
+  color: var(--primary);
+  margin: 2px 0 0 0;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* SCREEN AREA */
+.display-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 14px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.calc-screen {
+  background: #131313;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.6);
+  min-height: 86px;
+}
+
+.calc-expr-history {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-align: right;
+  min-height: 18px;
+  word-break: break-all;
+}
+
+.calc-current-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--primary);
+  text-align: right;
+  word-break: break-all;
+  line-height: 1.2;
+}
+
+/* QUICK ACTIONS BAR */
+.quick-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.quick-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 4px;
+  color: #DDD;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  user-select: none;
+}
+.quick-btn:active {
+  background: var(--surface-active);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* MINIMAL BREAKDOWN */
+.breakdown-card {
+  background: var(--surface-subtle);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.breakdown-title {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.unit-pill {
+  background: #1C1C1C;
+  border: 1px solid #333;
+  border-radius: 5px;
+  padding: 4px 9px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #EEE;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.unit-pill .tag {
+  color: var(--primary);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* FIXED BOTTOM KEYPAD */
+.calc-keypad {
+  background: #121212;
+  border-top: 1px solid #242424;
+  padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex-shrink: 0;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+/* FRACTION STRIP */
+.fraction-strip-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.frac-tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.frac-tab-btn {
+  font-size: 9.5px;
+  background: #1C1C1C;
+  border: 1px solid #333;
+  color: var(--text-secondary);
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.frac-tab-btn.active {
+  background: var(--primary-glow);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.frac-grid {
+  display: grid;
+  gap: 4px;
+}
+.frac-grid-7 { grid-template-columns: repeat(7, 1fr); }
+.frac-grid-8 { grid-template-columns: repeat(8, 1fr); }
+.hidden { display: none !important; }
+
+.k-btn {
+  background: var(--surface);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 0;
+  font-size: 17px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.05s, background 0.08s;
+}
+.k-btn:active {
+  background: var(--surface-active);
+  transform: scale(0.96);
+}
+
+.k-btn.unit-btn {
+  background: rgba(255, 159, 28, 0.14);
+  color: var(--primary);
+  border-color: rgba(255, 159, 28, 0.45);
+  font-weight: 800;
+  font-size: 15px;
+}
+
+.k-btn.op-btn {
+  background: #222222;
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 18px;
+  border-color: #383838;
+}
+
+.k-btn.action-btn {
+  background: #202020;
+  color: #BDBDBD;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.k-btn.equal-btn {
+  background: var(--primary);
+  color: #000;
+  font-weight: 800;
+  font-size: 20px;
+  border: none;
+}
+
+.k-btn.frac-key {
+  background: rgba(255, 159, 28, 0.09);
+  color: var(--primary);
+  border-color: rgba(255, 159, 28, 0.3);
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: 8px 0;
+}
+.k-btn.frac-16 { font-size: 11.5px; padding: 7px 0; }
+
+/* 5-COLUMN KEYPAD */
+.keypad-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+}
+
+/* HISTORY SLIDE-UP DRAWER */
+.history-drawer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #141414;
+  border-top: 2px solid var(--primary);
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+  max-height: 75%;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.9);
+  transition: transform 0.22s ease-out;
+  transform: translateY(100%);
+}
+.history-drawer.open {
+  transform: translateY(0);
+}
+
+.drawer-header {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.drawer-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.icon-btn {
+  background: var(--surface);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.icon-btn:active { background: var(--surface-active); color: var(--primary); }
+
+.history-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.history-item {
+  background: #1A1A1A;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+.history-item:active { background: #252525; }
+.history-expr {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+.history-res {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-top: 2px;
+}
+
+/* TOAST */
+.toast {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: #252525;
+  border: 1px solid var(--primary);
+  color: #FFF;
+  padding: 7px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  z-index: 9999;
+}
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app-container">
+  <!-- HEADER -->
+  <header class="header">
+    <div>
+      <h1>SIMPLE FEET INCH CALCULATOR</h1>
+      <p>By Tajmul</p>
+    </div>
+  </header>
+
+  <!-- DISPLAY AREA -->
+  <div class="display-area">
+    <div class="calc-screen">
+      <div id="calcExpr" class="calc-expr-history"></div>
+      <div id="calcCurrent" class="calc-current-val">0"</div>
+    </div>
+
+    <!-- QUICK BUTTONS -->
+    <div class="quick-bar">
+      <button class="quick-btn" onclick="doQuickOp('half')">½ Half</button>
+      <button class="quick-btn" onclick="doQuickOp('double')">2× Dbl</button>
+      <button class="quick-btn" onclick="toggleHistory(true)">📜 Tape</button>
+      <button class="quick-btn" onclick="copyResult()">📋 Copy</button>
+    </div>
+
+    <!-- BREAKDOWN -->
+    <div class="breakdown-card">
+      <div class="breakdown-title">Measurements Breakdown</div>
+      <div class="pill-row">
+        <div class="unit-pill">
+          <span class="tag">Ft-In:</span>
+          <span id="pillFtIn">0"</span>
+        </div>
+        <div class="unit-pill">
+          <span class="tag">Total Inches:</span>
+          <span id="pillInches">0"</span>
+        </div>
+        <div id="pillAreaBox" class="unit-pill hidden">
+          <span class="tag">Area:</span>
+          <span id="pillArea">0 sq ft</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KEYPAD -->
+  <div class="calc-keypad">
+    <!-- FRACTIONS BAR -->
+    <div class="fraction-strip-wrapper">
+      <span style="font-size: 9px; font-weight:700; color:var(--text-secondary);">FRACTIONS:</span>
+      <div class="frac-tabs">
+        <button id="tab8" class="frac-tab-btn active" onclick="setFracMode(8)">1/8s</button>
+        <button id="tab16" class="frac-tab-btn" onclick="setFracMode(16)">1/16s</button>
+      </div>
+    </div>
+
+    <div id="fracRow8" class="frac-grid frac-grid-7">
+      <button class="k-btn frac-key" onclick="inputFraction(1/8, '⅛')">⅛</button>
+      <button class="k-btn frac-key" onclick="inputFraction(1/4, '¼')">¼</button>
+      <button class="k-btn frac-key" onclick="inputFraction(3/8, '⅜')">⅜</button>
+      <button class="k-btn frac-key" onclick="inputFraction(1/2, '½')">½</button>
+      <button class="k-btn frac-key" onclick="inputFraction(5/8, '⅝')">⅝</button>
+      <button class="k-btn frac-key" onclick="inputFraction(3/4, '¾')">¾</button>
+      <button class="k-btn frac-key" onclick="inputFraction(7/8, '⅞')">⅞</button>
+    </div>
+
+    <div id="fracRow16" class="frac-grid frac-grid-8 hidden">
+      <button class="k-btn frac-key frac-16" onclick="inputFraction(1/16, '1/16')">1/16</button>
+      <button class="k-btn frac-key frac-16" onclick="inputFraction(3/16, '3/16')">3/16</button>
+      <button class="k-btn frac-key frac-16" onclick="inputFraction(5/16, '5/16')">5/16</button>
+      <button class="k-btn frac-key frac-16" onclick="inputFraction(7/16, '7/16')">7/16</button>
+      <button class="k-btn frac-key frac-16" onclick="inputFraction(9/16, '9/16')">9/16</button>
+      <button class="k-btn frac-key frac-16" onclick="inputFraction(11/16, '11/16')">11/16</button>
+      <button class="k-btn frac-key frac-16" onclick="inputFraction(13/16, '13/16')">13/16</button>
+      <button class="k-btn frac-key frac-16" onclick="inputFraction(15/16, '15/16')">15/16</button>
+    </div>
+
+    <!-- MAIN KEYPAD GRID -->
+    <div class="keypad-grid">
+      <button class="k-btn unit-btn" onclick="applyUnit('FT')">FT</button>
+      <button class="k-btn" onclick="inputDigit('7')">7</button>
+      <button class="k-btn" onclick="inputDigit('8')">8</button>
+      <button class="k-btn" onclick="inputDigit('9')">9</button>
+      <button class="k-btn op-btn" onclick="applyOperator('÷')">÷</button>
+
+      <button class="k-btn unit-btn" onclick="applyUnit('IN')">IN</button>
+      <button class="k-btn" onclick="inputDigit('4')">4</button>
+      <button class="k-btn" onclick="inputDigit('5')">5</button>
+      <button class="k-btn" onclick="inputDigit('6')">6</button>
+      <button class="k-btn op-btn" onclick="applyOperator('×')">×</button>
+
+      <button class="k-btn action-btn" onclick="clearEntry()">C</button>
+      <button class="k-btn" onclick="inputDigit('1')">1</button>
+      <button class="k-btn" onclick="inputDigit('2')">2</button>
+      <button class="k-btn" onclick="inputDigit('3')">3</button>
+      <button class="k-btn op-btn" onclick="applyOperator('-')">−</button>
+
+      <button class="k-btn action-btn" onclick="clearAll()">AC</button>
+      <button class="k-btn" onclick="inputDigit('0')">0</button>
+      <button class="k-btn" onclick="inputDigit('.')">.</button>
+      <button class="k-btn action-btn" onclick="handleBackspace()">⌫</button>
+      <button class="k-btn op-btn" onclick="applyOperator('+')">+</button>
+
+      <!-- BOTTOM ROW -->
+      <button class="k-btn action-btn" style="grid-column: span 2;" onclick="inputDigit('00')">00</button>
+      <button class="k-btn equal-btn" style="grid-column: span 3;" onclick="evaluateCalculation()">=</button>
+    </div>
+  </div>
+
+  <!-- CALCULATION TAPE DRAWER -->
+  <div id="historyDrawer" class="history-drawer">
+    <div class="drawer-header">
+      <span class="drawer-title">📜 Calculation Tape</span>
+      <div style="display:flex; gap:6px;">
+        <button class="icon-btn" onclick="clearHistory()">Clear</button>
+        <button class="icon-btn" onclick="toggleHistory(false)">✕</button>
+      </div>
+    </div>
+    <div id="historyList" class="history-list">
+      <div style="text-align:center; color:var(--text-secondary); font-size:12px; margin-top:20px;">
+        No calculations yet
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast">Copied to clipboard!</div>
+
+<script>
+/* -------------------------------------------------------------
+   ROBUST & SIMPLE FEET-INCH CALCULATOR ENGINE
+   ------------------------------------------------------------- */
+let curInput = "";       // Raw digits currently being typed (e.g. "6", "12")
+let curFeet = null;      // Feet value if FT has been pressed
+let curInches = null;    // Inches value if IN has been pressed
+let curFracVal = 0;      // Fractional inches (e.g. 0.5 for 1/2)
+let curFracStr = "";     // Fraction string (e.g. "½")
+
+let expressionTokens = [];
+let lastEvaluatedResult = null;
+let lastExpressionString = "";
+let calculationHistory = [];
+
+function setFracMode(denom) {
+  document.getElementById('tab8').classList.toggle('active', denom === 8);
+  document.getElementById('tab16').classList.toggle('active', denom === 16);
+  document.getElementById('fracRow8').classList.toggle('hidden', denom !== 8);
+  document.getElementById('fracRow16').classList.toggle('hidden', denom !== 16);
+}
+
+function isComposing() {
+  return curInput !== "" || curFeet !== null || curInches !== null || curFracStr !== "";
+}
+
+function commitCurrentToken() {
+  curInput = "";
+  curFeet = null;
+  curInches = null;
+  curFracVal = 0;
+  curFracStr = "";
+}
+
+function getCurrentTokenValue() {
+  if (!isComposing()) return null;
+
+  let totalInches = 0;
+
+  if (curFeet !== null) {
+    totalInches += curFeet * 12;
+  }
+  if (curInches !== null) {
+    totalInches += curInches;
+  }
+  if (curFracVal > 0) {
+    totalInches += curFracVal;
+  }
+  if (curInput !== "") {
+    let num = parseFloat(curInput) || 0;
+    if (curFeet !== null && curInches === null) {
+      // User typed "75 FT 4" without pressing IN -> 4 is inches
+      totalInches += num;
+    } else if (curFeet === null && curInches === null && curFracVal === 0) {
+      // Bare number typed without units
+      return { val: num, unit: 'scalar' };
+    } else {
+      totalInches += num;
+    }
+  }
+
+  return { val: totalInches, unit: 'linear' };
+}
+
+function getCurrentDisplayString() {
+  if (isComposing()) {
+    let parts = [];
+    if (curFeet !== null) {
+      parts.push(`${curFeet}'`);
+    }
+
+    if (curInches !== null) {
+      let inStr = `${curInches}`;
+      if (curFracStr) inStr += ` ${curFracStr}`;
+      inStr += `"`;
+      parts.push(inStr);
+    } else if (curFracStr) {
+      if (curInput !== "") {
+        parts.push(`${curInput} ${curFracStr}"`);
+      } else {
+        parts.push(`${curFracStr}"`);
+      }
+    } else if (curInput !== "") {
+      if (curFeet !== null) {
+        parts.push(`${curInput}"`);
+      } else {
+        parts.push(curInput);
+      }
+    }
+
+    return parts.join(' ');
+  }
+
+  if (lastEvaluatedResult !== null && expressionTokens.length === 0) {
+    return formatValueForDisplay(lastEvaluatedResult);
+  }
+
+  if (expressionTokens.length > 0) {
+    let last = expressionTokens[expressionTokens.length - 1];
+    if (typeof last === 'object') {
+      return formatValueForDisplay(last);
+    }
+  }
+
+  return "0\"";
+}
+
+/* KEYPAD INPUTS */
+function inputDigit(d) {
+  if (lastEvaluatedResult !== null && expressionTokens.length === 0 && !isComposing()) {
+    commitCurrentToken();
+    lastEvaluatedResult = null;
+    lastExpressionString = "";
+  }
+
+  if (d === '.') {
+    if (curInput.includes('.')) return;
+    if (curInput === "") curInput = "0.";
+    else curInput += ".";
+    updateUI();
+    return;
+  }
+
+  if (d === '00') {
+    if (curInput === "" || curInput === "0") return;
+    curInput += "00";
+    updateUI();
+    return;
+  }
+
+  if (curInput === "0") {
+    curInput = d;
+  } else {
+    curInput += d;
+  }
+
+  updateUI();
+}
+
+function inputFraction(val, symbol) {
+  if (lastEvaluatedResult !== null && expressionTokens.length === 0 && !isComposing()) {
+    commitCurrentToken();
+    lastEvaluatedResult = null;
+    lastExpressionString = "";
+  }
+
+  if (curInput !== "") {
+    curInches = (curInches || 0) + (parseFloat(curInput) || 0);
+    curInput = "";
+  }
+  curFracVal = val;
+  curFracStr = symbol;
+  updateUI();
+}
+
+function applyUnit(unitKey) {
+  if (lastEvaluatedResult !== null && expressionTokens.length === 0 && !isComposing()) {
+    commitCurrentToken();
+    lastEvaluatedResult = null;
+    lastExpressionString = "";
+  }
+
+  let num = parseFloat(curInput);
+
+  if (unitKey === 'FT') {
+    if (!isNaN(num)) {
+      curFeet = num;
+      curInput = "";
+    }
+  } else if (unitKey === 'IN') {
+    if (!isNaN(num)) {
+      curInches = num;
+      curInput = "";
+    } else if (curFeet !== null && curInches === null) {
+      curInches = 0;
+    }
+  }
+
+  updateUI();
+}
+
+function handleBackspace() {
+  if (curInput.length > 0) {
+    curInput = curInput.slice(0, -1);
+  } else if (curFracStr !== "") {
+    curFracVal = 0;
+    curFracStr = "";
+  } else if (curInches !== null) {
+    curInput = curInches.toString();
+    curInches = null;
+  } else if (curFeet !== null) {
+    curInput = curFeet.toString();
+    curFeet = null;
+  } else if (expressionTokens.length > 0) {
+    let last = expressionTokens.pop();
+    if (typeof last === 'object') {
+      if (last.unit === 'linear') {
+        let totalIn = last.val;
+        let ft = Math.floor(totalIn / 12);
+        let remIn = totalIn % 12;
+        if (ft > 0) curFeet = ft;
+        if (remIn > 0) curInches = remIn;
+      } else {
+        curInput = last.val.toString();
+      }
+    }
+  }
+  updateUI();
+}
+
+function clearEntry() {
+  commitCurrentToken();
+  updateUI();
+}
+
+function clearAll() {
+  commitCurrentToken();
+  expressionTokens = [];
+  lastEvaluatedResult = null;
+  lastExpressionString = "";
+  updateUI();
+}
+
+function normalizeOp(op) {
+  if (op === '−' || op === '-') return '-';
+  if (op === '×' || op === '*') return '×';
+  if (op === '÷' || op === '/') return '÷';
+  if (op === '+') return '+';
+  return op;
+}
+
+function applyOperator(op) {
+  let norm = normalizeOp(op);
+  let active = getCurrentTokenValue();
+
+  if (active === null) {
+    if (expressionTokens.length > 0) {
+      let last = expressionTokens[expressionTokens.length - 1];
+      if (typeof last === 'string') {
+        expressionTokens[expressionTokens.length - 1] = norm;
+        updateUI();
+        return;
+      }
+    } else if (lastEvaluatedResult !== null) {
+      active = lastEvaluatedResult;
+    } else {
+      active = { val: 0, unit: 'linear' };
+    }
+  }
+
+  if (active !== null) {
+    expressionTokens.push(active);
+    commitCurrentToken();
+  }
+
+  expressionTokens.push(norm);
+  lastEvaluatedResult = null;
+  lastExpressionString = "";
+  updateUI();
+}
+
+function evaluateCalculation() {
+  let active = getCurrentTokenValue();
+  if (active !== null) {
+    expressionTokens.push(active);
+    commitCurrentToken();
+  } else if (expressionTokens.length > 0 && typeof expressionTokens[expressionTokens.length - 1] === 'string') {
+    expressionTokens.pop();
+  }
+
+  if (expressionTokens.length === 0) return;
+
+  let exprStr = formatExpressionString(expressionTokens);
+  let result = computeTokens(expressionTokens);
+
+  if (result !== null) {
+    lastEvaluatedResult = result;
+    lastExpressionString = exprStr + " =";
+    calculationHistory.unshift({
+      expr: exprStr,
+      res: formatValueForDisplay(result),
+      rawResult: result
+    });
+    renderHistory();
+    expressionTokens = [];
+  }
+  updateUI();
+}
+
+function computeTokens(tokens) {
+  if (!tokens || tokens.length === 0) return null;
+  if (tokens.length === 1 && typeof tokens[0] === 'object') return tokens[0];
+
+  let list = tokens.map(t => typeof t === 'object' ? { ...t } : t);
+
+  // Pass 1: Multiplication & Division
+  for (let i = 0; i < list.length; i++) {
+    let op = normalizeOp(list[i]);
+    if (op === '×' || op === '÷') {
+      let a = list[i - 1];
+      let b = list[i + 1];
+      if (!a || !b || typeof a !== 'object' || typeof b !== 'object') continue;
+
+      let res = operate(a, op, b);
+      list.splice(i - 1, 3, res);
+      i--;
+    }
+  }
+
+  // Pass 2: Addition & Subtraction
+  for (let i = 0; i < list.length; i++) {
+    let op = normalizeOp(list[i]);
+    if (op === '+' || op === '-') {
+      let a = list[i - 1];
+      let b = list[i + 1];
+      if (!a || !b || typeof a !== 'object' || typeof b !== 'object') continue;
+
+      let res = operate(a, op, b);
+      list.splice(i - 1, 3, res);
+      i--;
+    }
+  }
+
+  return typeof list[0] === 'object' ? list[0] : null;
+}
+
+function operate(a, op, b) {
+  let valA = a.val;
+  let valB = b.val;
+  let unitA = a.unit || 'linear';
+  let unitB = b.unit || 'linear';
+  let norm = normalizeOp(op);
+
+  if (norm === '+') {
+    let unit = (unitA === 'linear' || unitB === 'linear') ? 'linear' : ((unitA === 'area' || unitB === 'area') ? 'area' : 'scalar');
+    return { val: valA + valB, unit };
+  }
+  if (norm === '-') {
+    let unit = (unitA === 'linear' || unitB === 'linear') ? 'linear' : ((unitA === 'area' || unitB === 'area') ? 'area' : 'scalar');
+    return { val: valA - valB, unit };
+  }
+  if (norm === '×') {
+    if (unitA === 'linear' && unitB === 'linear') {
+      return { val: valA * valB, unit: 'area' };
+    }
+    let unit = (unitA === 'linear' || unitB === 'linear') ? 'linear' : ((unitA === 'area' || unitB === 'area') ? 'area' : 'scalar');
+    return { val: valA * valB, unit };
+  }
+  if (norm === '÷') {
+    if (Math.abs(valB) < 1e-9) return { val: 0, unit: 'scalar' };
+    if (unitA === 'area' && unitB === 'linear') return { val: valA / valB, unit: 'linear' };
+    if (unitA === 'linear' && unitB === 'linear') return { val: valA / valB, unit: 'scalar' };
+    return { val: valA / valB, unit: unitA };
+  }
+  return { val: 0, unit: 'scalar' };
+}
+
+function doQuickOp(type) {
+  let active = getCurrentTokenValue();
+  if (active === null) {
+    if (lastEvaluatedResult !== null) active = lastEvaluatedResult;
+    else return;
+  }
+
+  let multiplier = type === 'half' ? 0.5 : 2;
+  active = { val: active.val * multiplier, unit: active.unit };
+
+  commitCurrentToken();
+  lastEvaluatedResult = active;
+  lastExpressionString = "";
+  updateUI();
+}
+
+/* FORMATTING HELPERS */
+function formatInchesToFrac(totalInches) {
+  let isNeg = totalInches < 0;
+  let x = Math.abs(totalInches);
+  if (x < 0.0001) return '0"';
+
+  let total16ths = Math.round(x * 16);
+  let totalIn = Math.floor(total16ths / 16);
+  let rem16 = total16ths % 16;
+
+  let ft = Math.floor(totalIn / 12);
+  let inch = totalIn % 12;
+
+  let fracStr = "";
+  if (rem16 > 0) {
+    function gcd(a, b) { return b ? gcd(b, a % b) : a; }
+    let g = gcd(rem16, 16);
+    let num = rem16 / g;
+    let den = 16 / g;
+    const unicodeMap = {
+      '1/2': '½', '1/4': '¼', '3/4': '¾',
+      '1/8': '⅛', '3/8': '⅜', '5/8': '⅝', '7/8': '⅞'
+    };
+    let ratio = `${num}/${den}`;
+    fracStr = unicodeMap[ratio] || ratio;
+  }
+
+  let res = "";
+  if (ft > 0) {
+    if (inch > 0 || fracStr) {
+      res = `${ft}' ${inch}${fracStr ? ' ' + fracStr : ''}"`;
+    } else {
+      res = `${ft}' 0"`;
+    }
+  } else {
+    if (inch > 0 || fracStr) {
+      res = `${inch}${fracStr ? ' ' + fracStr : ''}"`;
+    } else {
+      res = `0"`;
+    }
+  }
+
+  return (isNeg ? '-' : '') + res.trim();
+}
+
+function formatTotalInchesFrac(totalInches) {
+  let isNeg = totalInches < 0;
+  let x = Math.abs(totalInches);
+  if (x < 0.0001) return '0"';
+
+  let total16ths = Math.round(x * 16);
+  let wholeIn = Math.floor(total16ths / 16);
+  let rem16 = total16ths % 16;
+
+  let fracStr = "";
+  if (rem16 > 0) {
+    function gcd(a, b) { return b ? gcd(b, a % b) : a; }
+    let g = gcd(rem16, 16);
+    let num = rem16 / g;
+    let den = 16 / g;
+    const unicodeMap = {
+      '1/2': '½', '1/4': '¼', '3/4': '¾',
+      '1/8': '⅛', '3/8': '⅜', '5/8': '⅝', '7/8': '⅞'
+    };
+    let ratio = `${num}/${den}`;
+    fracStr = unicodeMap[ratio] || ratio;
+  }
+
+  let res = `${wholeIn}`;
+  if (fracStr) res += ` ${fracStr}`;
+  res += `"`;
+  return (isNeg ? '-' : '') + res;
+}
+
+function formatValueForDisplay(valObj) {
+  if (!valObj) return '0"';
+  if (valObj.unit === 'linear') {
+    return formatInchesToFrac(valObj.val);
+  } else if (valObj.unit === 'area') {
+    let sqFt = valObj.val / 144;
+    return `${sqFt.toFixed(2)} Sq.Ft`;
+  } else {
+    return Number(valObj.val.toFixed(4)).toString();
+  }
+}
+
+function formatExpressionString(tokens) {
+  return tokens.map(t => {
+    if (typeof t === 'string') {
+      let displayOp = t === '-' ? '−' : t;
+      return ` ${displayOp} `;
+    }
+    return formatValueForDisplay(t);
+  }).join('');
+}
+
+function updateUI() {
+  const exprEl = document.getElementById('calcExpr');
+  const currentEl = document.getElementById('calcCurrent');
+  const pillFtIn = document.getElementById('pillFtIn');
+  const pillInches = document.getElementById('pillInches');
+  const pillAreaBox = document.getElementById('pillAreaBox');
+  const pillArea = document.getElementById('pillArea');
+
+  if (expressionTokens.length > 0) {
+    exprEl.innerText = formatExpressionString(expressionTokens);
+  } else if (lastExpressionString) {
+    exprEl.innerText = lastExpressionString;
+  } else {
+    exprEl.innerText = "";
+  }
+
+  currentEl.innerText = getCurrentDisplayString();
+
+  // Breakdown resolution
+  let target = getCurrentTokenValue();
+  if (target === null) {
+    if (lastEvaluatedResult !== null) target = lastEvaluatedResult;
+    else if (expressionTokens.length > 0) {
+      let cand = [...expressionTokens].reverse().find(t => typeof t === 'object');
+      if (cand) target = cand;
+    }
+  }
+
+  if (!target) target = { val: 0, unit: 'linear' };
+
+  if (target.unit === 'linear' || target.unit === 'scalar') {
+    pillAreaBox.classList.add('hidden');
+    let inches = target.val;
+
+    pillFtIn.innerText = formatInchesToFrac(inches);
+    pillInches.innerText = formatTotalInchesFrac(inches);
+  } else if (target.unit === 'area') {
+    pillAreaBox.classList.remove('hidden');
+    let sqInches = target.val;
+    let sqFt = sqInches / 144;
+
+    pillFtIn.innerText = `${sqFt.toFixed(2)} Sq.Ft`;
+    pillInches.innerText = `${sqInches.toFixed(0)} Sq.In`;
+    pillArea.innerText = `${sqFt.toFixed(2)} Sq.Ft`;
+  }
+}
+
+/* TAPE & CLIPBOARD */
+function toggleHistory(open) {
+  document.getElementById('historyDrawer').classList.toggle('open', open);
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  if (calculationHistory.length === 0) {
+    list.innerHTML = `<div style="text-align:center; color:var(--text-secondary); font-size:12px; margin-top:20px;">No calculations yet</div>`;
+    return;
+  }
+  list.innerHTML = calculationHistory.map((item, idx) => `
+    <div class="history-item" onclick="recallHistory(${idx})">
+      <div class="history-expr">${item.expr} =</div>
+      <div class="history-res">${item.res}</div>
+    </div>
+  `).join('');
+}
+
+function recallHistory(idx) {
+  const item = calculationHistory[idx];
+  if (item && item.rawResult) {
+    commitCurrentToken();
+    expressionTokens = [];
+    lastEvaluatedResult = item.rawResult;
+    lastExpressionString = item.expr + " =";
+    updateUI();
+    showToast(`Recalled: ${item.res}`);
+    toggleHistory(false);
+  }
+}
+
+function clearHistory() {
+  calculationHistory = [];
+  renderHistory();
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.innerText = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 1600);
+}
+
+function copyResult() {
+  const text = document.getElementById('calcCurrent').innerText;
+  const dummy = document.createElement("textarea");
+  document.body.appendChild(dummy);
+  dummy.value = text;
+  dummy.select();
+  try {
+    document.execCommand('copy');
+    showToast("Copied to clipboard!");
+  } catch (err) {
+    showToast("Copy failed");
+  }
+  document.body.removeChild(dummy);
+}
+
+window.onload = function() {
+  updateUI();
+};
+</script>
+</body>
+</html>
