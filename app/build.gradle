@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace 'com.tajmul.simplefeetcalculator'
+    namespace 'com.tajmul.simplefeetinchcalculator'
     compileSdk 35
 
     defaultConfig {
