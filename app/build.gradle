@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.tajmul.feetcalculator'
+    namespace 'com.tajmul.simplefeetinchcalculator'
     compileSdk 35
 
     defaultConfig {
-        applicationId "com.tajmul.feetcalculator"
+        applicationId "com.tajmul.simplefeetinchcalculator"
         minSdk 24
         targetSdk 35
         versionCode 1
